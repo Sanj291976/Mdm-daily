@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MDM Delivery Register</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:Arial,sans-serif;background:#0a0e0c;color:#c8d8c0;min-height:100vh;}
+.hdr{background:linear-gradient(135deg,#0d1f0a,#1a3a10);padding:10px 14px;border-bottom:2px solid #2a5a15;}
+.hdr h1{font-size:16px;font-weight:800;color:#7ddd44;}
+.hdr p{font-size:10px;color:#445533;}
+
+.sec-bar{display:flex;background:#0a1208;border-bottom:2px solid #1a2e10;overflow-x:auto;}
+.secbtn{flex:1;min-width:70px;padding:8px 4px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;color:#445533;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.secbtn.sel{color:#7ddd44;border-bottom-color:#7ddd44;background:#0d150a;}
+
+.qtr-bar{background:#0d1a0a;padding:7px 12px;border-bottom:1px solid #1a2e10;}
+.qtr-lbl{font-size:9px;color:#445533;text-transform:uppercase;font-weight:700;margin-bottom:4px;}
+.qtr-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.qbtn{background:#0f1a0c;border:1px solid #1a2e10;border-radius:6px;color:#556644;font-size:10px;font-weight:700;padding:4px 8px;cursor:pointer;font-family:Arial,sans-serif;}
+.qbtn.sel{background:#1a3a10;border-color:#4a8a25;color:#7ddd44;}
+
+.stock-bar{display:grid;background:#0d2a18;border-bottom:2px solid #1a3a10;}
+.sb-item{padding:6px 4px;text-align:center;border-right:1px solid #1a3a10;}
+.sb-item:last-child{border-right:none;}
+.sb-lbl{font-size:8px;color:#445533;text-transform:uppercase;font-weight:700;margin-bottom:1px;}
+.sb-val{font-size:11px;font-weight:800;}
+
+.tabs{display:flex;background:#0d150a;border-bottom:2px solid #1a2e10;}
+.tab{flex:1;padding:8px 2px;font-size:10px;font-weight:700;text-align:center;cursor:pointer;color:#445533;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab.active{color:#7ddd44;border-bottom-color:#7ddd44;background:#0a1208;}
+
+.page{display:none;padding:10px;}
+.page.active{display:block;}
+
+.form-box{background:#111f0e;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #1a2e10;}
+.form-box h3{font-size:11px;color:#7ddd44;text-transform:uppercase;margin-bottom:10px;font-weight:700;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.row1{margin-bottom:8px;}
+.lbl{font-size:10px;color:#445533;text-transform:uppercase;margin-bottom:3px;font-weight:700;}
+input{width:100%;background:#0a0e0c;border:1px solid #1a3a20;border-radius:6px;color:#c8d8c0;font-size:15px;font-weight:700;padding:10px 8px;font-family:Arial,sans-serif;outline:none;}
+input:focus{border-color:#7ddd44;}
+textarea{width:100%;background:#0a0e0c;border:1px solid #1a3a20;border-radius:6px;color:#c8d8c0;font-size:13px;padding:10px 8px;font-family:Arial,sans-serif;outline:none;min-height:150px;line-height:2;}
+textarea:focus{border-color:#7ddd44;}
+
+.school-preview{background:#0a1208;border:1px solid #2a5a15;border-radius:8px;padding:10px;margin-bottom:10px;min-height:40px;display:flex;align-items:center;}
+.qty-box{background:#0a1208;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid #1a3a20;display:none;}
+.qty-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1a2e10;}
+.qty-row:last-child{border-bottom:none;}
+.qty-lbl{font-size:11px;color:#556644;}
+.qty-val{font-size:13px;font-weight:700;color:#00e5ff;}
+
+.btn{width:100%;padding:12px;border:none;border-radius:8px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;margin-bottom:6px;}
+.btn-green{background:#2a6a15;}
+.btn-blue{background:#1a3a6a;}
+
+.mode-row{display:flex;gap:8px;margin-bottom:10px;}
+.mbtn{flex:1;padding:8px;background:#0f1a0c;border:1px solid #1a2e10;border-radius:8px;color:#445533;font-size:11px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;}
+.mbtn.sel{background:#1a3a10;border:2px solid #7ddd44;color:#7ddd44;}
+
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:380px;}
+thead tr{background:#1a3a10;}
+th{padding:6px 4px;text-align:center;color:#7ddd44;border-bottom:2px solid #2a5a15;white-space:nowrap;font-size:9px;text-transform:uppercase;}
+th.left{text-align:left;}
+td{padding:6px 4px;border-bottom:1px solid #1a2e10;text-align:center;vertical-align:middle;}
+td.left{text-align:left;color:#c8d8c0;font-size:11px;}
+tfoot tr{background:#1a3a10;border-top:2px solid #2a5a15;}
+tfoot td{color:#7ddd44;font-weight:800;padding:7px 4px;font-size:10px;}
+
+.pend-card{background:#1a0d0a;border-radius:8px;padding:9px 12px;margin-bottom:5px;border-left:3px solid #f06060;display:flex;justify-content:space-between;align-items:center;}
+.pend-name{font-size:12px;font-weight:700;color:#c8a090;}
+.pend-sl{font-size:10px;color:#554433;}
+.pend-qty{font-size:11px;font-weight:700;color:#f06060;text-align:right;}
+
+.admin-box{background:#111f0e;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #1a2e10;}
+.admin-box h3{font-size:11px;color:#ffaa44;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+.code-prev{background:#0a0e0c;border:1px solid #1a3a20;border-radius:6px;padding:8px;font-size:10px;color:#7ddd44;font-family:monospace;margin-bottom:8px;white-space:pre;overflow-x:auto;}
+
+.toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a6a10;color:white;padding:9px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:flex-end;justify-content:center;}
+.modal-box{background:#111f0e;border-radius:14px 14px 0 0;padding:16px;width:100%;max-width:480px;border-top:2px solid #7ddd44;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>📋 MDM Delivery Register</h1>
+  <p>DWCCS · Bokul · Rohmaria — Jan/Feb/Mar 2026</p>
+</div>
+
+<div class="sec-bar" id="sec-bar"></div>
+
+<div class="qtr-bar">
+  <div class="qtr-lbl">📅 Quarter</div>
+  <div class="qtr-btns" id="qtr-btns"></div>
+</div>
+
+<div class="stock-bar" id="stock-bar"></div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-entry" ontouchstart="swTab('entry')">➕ Entry</div>
+  <div class="tab" id="tab-register" ontouchstart="swTab('register')">📋 Register</div>
+  <div class="tab" id="tab-pending" ontouchstart="swTab('pending')">⏳ Pending</div>
+  <div class="tab" id="tab-summary" ontouchstart="swTab('summary')">📊 Summary</div>
+  <div class="tab" id="tab-admin" ontouchstart="swTab('admin')">⚙️ Admin</div>
+</div>
+
+<div class="page active" id="page-entry">
+  <div id="no-data-msg" style="display:none;text-align:center;padding:30px;color:#f06060;font-size:13px;">⚠️ No data!<br>Go to ⚙️ Admin tab!</div>
+  <div id="entry-form">
+    <div class="mode-row">
+      <button class="mbtn sel" id="m-single" ontouchstart="setMode('single')">➕ Single</button>
+      <button class="mbtn" id="m-bulk" ontouchstart="setMode('bulk')">📋 Bulk</button>
+    </div>
+    <div class="form-box" id="single-form">
+      <h3 id="form-title">New Entry</h3>
+      <div class="row2">
+        <div><div class="lbl">📅 Date</div><input type="date" id="e-date"></div>
+        <div><div class="lbl">📝 Memo No</div><input type="text" inputmode="numeric" id="e-memo" placeholder="Memo No"></div>
+      </div>
+      <div class="row1">
+        <div class="lbl">🔢 SL No</div>
+        <input type="text" inputmode="numeric" id="e-sl" placeholder="Enter SL No" oninput="findSchool()">
+      </div>
+      <div class="school-preview" id="school-preview"><span style="color:#333;">School name will appear here...</span></div>
+      <div class="qty-box" id="qty-box"></div>
+      <button class="btn btn-green" ontouchstart="addEntry()">✅ Add Entry</button>
+    </div>
+    <div class="form-box" id="bulk-form" style="display:none;">
+      <h3>📋 Bulk Entry</h3>
+      <div class="row1"><div class="lbl">📅 Date</div><input type="date" id="b-date"></div>
+      <div class="lbl" style="margin-bottom:3px;">SL , Memo — one per line</div>
+      <div style="font-size:10px;color:#445533;margin-bottom:6px;">Example: 1,101</div>
+      <textarea id="bulk-txt" placeholder="1,101&#10;5,102&#10;8,103"></textarea>
+      <button class="btn btn-green" style="margin-top:8px;" ontouchstart="addBulk()">✅ Add All</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-register">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div style="font-size:11px;font-weight:700;color:#7ddd44;" id="r-count">0 Schools</div>
+    <button ontouchstart="clearAll()" style="background:none;border:1px solid #333;border-radius:5px;color:#555;font-size:10px;padding:3px 8px;cursor:pointer;">🗑 Clear</button>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr id="reg-thead"></tr></thead><tbody id="reg-tbody"></tbody><tfoot id="reg-tfoot"></tfoot></table>
+  </div>
+</div>
+
+<div class="page" id="page-pending">
+  <div style="font-size:12px;font-weight:700;color:#f06060;margin-bottom:8px;" id="pend-title">Pending</div>
+  <div id="pending-list"></div>
+</div>
+
+<div class="page" id="page-summary">
+  <div style="background:#0d2a18;border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid #2a5a15;" id="sum-totals"></div>
+  <div style="background:#111f0e;border-radius:10px;overflow:hidden;border:1px solid #1a2e10;">
+    <div style="background:#1a3a10;padding:9px 14px;font-size:12px;font-weight:700;color:#7ddd44;">Schools Issued</div>
+    <div id="sum-list"></div>
+  </div>
+</div>
+
+<div class="page" id="page-admin">
+  <div class="admin-box">
+    <h3>📋 Load New Quarter</h3>
+    <p style="font-size:10px;color:#ffaa44;margin-bottom:4px;">UPS format:</p>
+    <div class="code-prev">QTR:Apr-May-Jun 2026|DWCCS-UPS|136.200
+1|School Name|5.112
+2|School Name|4.545</div>
+    <p style="font-size:10px;color:#ffaa44;margin-bottom:4px;">LPS format (MDM|Bal):</p>
+    <div class="code-prev">QTR:Apr-May-Jun 2026|DWCCS-LPS|131.232
+1|School Name|5.001|0.510
+2|School Name|6.999|0.510</div>
+  </div>
+  <div class="admin-box">
+    <h3>📥 Paste Data</h3>
+    <textarea id="admin-paste" placeholder="Paste quarter data here..."></textarea>
+    <button class="btn btn-blue" style="margin-top:8px;" ontouchstart="loadAdmin()">📥 Load</button>
+  </div>
+  <div class="admin-box">
+    <h3>📅 All Sections</h3>
+    <div id="qtr-list"></div>
+  </div>
+</div>
+
+<div class="modal" id="edit-modal">
+  <div class="modal-box">
+    <div style="font-size:14px;font-weight:700;color:#7ddd44;margin-bottom:4px;">✏️ Edit Entry</div>
+    <div style="font-size:11px;color:#445533;margin-bottom:12px;" id="edit-name"></div>
+    <div class="row2">
+      <div><div class="lbl">Date</div><input type="date" id="edit-date"></div>
+      <div><div class="lbl">Memo No</div><input type="text" inputmode="numeric" id="edit-memo"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button ontouchstart="closeEdit()" style="flex:1;padding:11px;background:#0a0e0c;border:1px solid #333;border-radius:7px;color:#555;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;">Cancel</button>
+      <button ontouchstart="saveEdit()" style="flex:1;padding:11px;background:#1a3a10;border:none;border-radius:7px;color:#7ddd44;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;">✅ Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// ALL SCHOOL DATA
+// ══════════════════════════════════════════
+var DB = {
+  'DWCCS-UPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:false,totalMdm:136.200,totalBal:0,schools:[
+    {sl:1,name:'B.N.P H.S School',mdm:5.112,bal:0},
+    {sl:2,name:'Victoria H.S. School',mdm:4.545,bal:0},
+    {sl:3,name:'Surajmal Jalan Balika Shiksha Sadan',mdm:19.245,bal:0},
+    {sl:4,name:'Santipara Bengali High School',mdm:4.452,bal:0},
+    {sl:5,name:'N.C. High School',mdm:3.000,bal:0},
+    {sl:6,name:'Bani Sadan MES',mdm:0.303,bal:0},
+    {sl:7,name:'Graham Bazar Girls High School',mdm:16.110,bal:0},
+    {sl:8,name:'Graham Bazar Boys High School',mdm:7.572,bal:0},
+    {sl:9,name:'Nirmali Girls High School',mdm:6.273,bal:0},
+    {sl:10,name:'Amolapatty MVS',mdm:5.460,bal:0},
+    {sl:11,name:'Amolapatty Girls High School',mdm:4.227,bal:0},
+    {sl:12,name:'Jeoti Morol MES',mdm:2.001,bal:0},
+    {sl:13,name:'Govt Girls HS',mdm:15.000,bal:0},
+    {sl:14,name:'Barbari AMC MES',mdm:4.113,bal:0},
+    {sl:15,name:'Barbari Railway MES',mdm:6.981,bal:0},
+    {sl:16,name:'Sri Laxmimandir Gandhi A. MES',mdm:3.819,bal:0},
+    {sl:17,name:'Naliapool Bengali High School',mdm:4.227,bal:0},
+    {sl:18,name:'Sagar Smriti Vidya Mandir MES',mdm:3.012,bal:0},
+    {sl:19,name:'Jyotinagar Marwari Hindi MES',mdm:2.499,bal:0},
+    {sl:20,name:'Sri Durga Mandir Hindi MES',mdm:9.171,bal:0},
+    {sl:21,name:'Paltan Bazar MES',mdm:4.815,bal:0},
+    {sl:22,name:'Jalannagar Refugee MES',mdm:3.999,bal:0},
+    {sl:23,name:'Dibrugarh Railway HE School',mdm:0.264,bal:0}
+  ]}},
+  'DWCCS-LPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:true,totalMdm:122.042,totalBal:9.190,schools:[
+    {sl:1,name:'Rashtra Bhasha Deep Vid LPS',mdm:5.001,bal:0.510},
+    {sl:2,name:'Natun Amolapatty Balika LPS',mdm:6.999,bal:0.510},
+    {sl:3,name:'Victoria H.S. School',mdm:2.001,bal:0.510},
+    {sl:4,name:'Dighali Bazar LPS',mdm:6.000,bal:0.510},
+    {sl:5,name:'Santipara Bengali High School',mdm:3.000,bal:0.510},
+    {sl:6,name:'Santipara Horizon LPS',mdm:0.549,bal:0.000},
+    {sl:7,name:'No.1 Purnananda Road Adarsha LPS',mdm:5.001,bal:0.510},
+    {sl:8,name:'Bani Sadan MES',mdm:0.420,bal:0.100},
+    {sl:9,name:'Dibrugarh Bengali High School',mdm:0.000,bal:0.000},
+    {sl:10,name:'Nirmali Girls High School',mdm:2.001,bal:0.000},
+    {sl:11,name:'Dakhin Jalan Milan LPS',mdm:2.499,bal:0.090},
+    {sl:12,name:'Dakhin Jalan Mohanbari LPS',mdm:2.151,bal:0.810},
+    {sl:13,name:'Chiring Gaon Rly Colony LPS',mdm:1.500,bal:0.100},
+    {sl:14,name:'Chiring Gaon LPS',mdm:1.017,bal:0.100},
+    {sl:15,name:'Nepali Hindi LPS',mdm:2.157,bal:0.100},
+    {sl:16,name:'Amolapatty MVS',mdm:3.000,bal:0.100},
+    {sl:17,name:'Amolapatty Horizon Hindi LPS',mdm:1.449,bal:0.100},
+    {sl:18,name:'Amolapatty Junior Basic LPS',mdm:3.999,bal:0.100},
+    {sl:19,name:'Ankur Bengali LPS',mdm:1.098,bal:0.100},
+    {sl:20,name:'Jeoti Morol MES',mdm:0.999,bal:0.300},
+    {sl:21,name:'Chaporiward Harizon LPS',mdm:1.032,bal:0.000},
+    {sl:22,name:'Ethelwood TE LPS',mdm:1.779,bal:0.100},
+    {sl:23,name:'Maijan LPS',mdm:4.131,bal:0.100},
+    {sl:24,name:'Ambedkar Hindi LPS',mdm:1.050,bal:0.100},
+    {sl:25,name:'Barbari LPS',mdm:9.000,bal:0.100},
+    {sl:26,name:'Khalihamari Assamese LPS',mdm:3.024,bal:0.100},
+    {sl:27,name:'Police Reserve LPS',mdm:1.014,bal:0.100},
+    {sl:28,name:'No.1 Tinkunia A.NB. Balika Bid',mdm:5.454,bal:0.510},
+    {sl:29,name:'Sri Laxmimandir Gandhi A. MES',mdm:1.947,bal:0.100},
+    {sl:30,name:'Grahambazar Boys LPS',mdm:5.001,bal:0.100},
+    {sl:31,name:'Gabharu Pather LPS',mdm:4.500,bal:0.100},
+    {sl:32,name:'Naliapool Bengali High School',mdm:0.999,bal:0.100},
+    {sl:33,name:'Laxminath Bezbaruah R.H.S. Sadan',mdm:2.028,bal:0.100},
+    {sl:34,name:'Navajyoti Hindi LPS',mdm:2.190,bal:0.510},
+    {sl:35,name:'Rastriya Hindi Siksha Sadan',mdm:1.422,bal:0.100},
+    {sl:36,name:'Dakhin Jalan Nagar TE LPS',mdm:0.831,bal:0.100},
+    {sl:37,name:'Kodamoni LPS',mdm:2.160,bal:0.300},
+    {sl:38,name:'Sri Sankardev LPS',mdm:3.000,bal:0.100},
+    {sl:39,name:'Madhab Dev LPS',mdm:2.001,bal:0.510},
+    {sl:40,name:'Sagar Smriti Vidya Mandir MES',mdm:1.299,bal:0.100},
+    {sl:41,name:'Paltan Bazar LPS',mdm:9.000,bal:0.300},
+    {sl:42,name:'Sri Durga Mandir Hindi Vidyala',mdm:1.431,bal:0.100},
+    {sl:43,name:'Jalannagar Refugee MES',mdm:3.410,bal:0.100},
+    {sl:44,name:'Dr B.R.Ambedkar Balika Vidyala',mdm:0.117,bal:0.100},
+    {sl:45,name:'Dibrugarh Railway HE School',mdm:0.837,bal:0.000},
+    {sl:46,name:'Paschim Gabharupather LPS',mdm:1.272,bal:0.100},
+    {sl:47,name:'Pub Chowkidingee LPS',mdm:1.272,bal:0.100}
+  ]}},
+  'Bokul-UPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:false,totalMdm:9.750,totalBal:0,schools:[
+    {sl:1,name:'Chaulkhowa H.S.',mdm:5.559,bal:0},
+    {sl:2,name:'Bishnujyoti MES',mdm:2.691,bal:0},
+    {sl:3,name:'Public High School',mdm:1.500,bal:0}
+  ]}},
+  'Bokul-LPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:true,totalMdm:21.930,totalBal:3.010,schools:[
+    {sl:1,name:'Titadimoru Kanoi LPS',mdm:2.079,bal:0.000},
+    {sl:2,name:'Gothop LPS',mdm:1.263,bal:0.100},
+    {sl:3,name:'Shastriji LPS',mdm:2.001,bal:0.810},
+    {sl:4,name:'Kathgaon Chapori Line LPS',mdm:2.226,bal:0.100},
+    {sl:5,name:'Bongal Gaon LPS',mdm:1.599,bal:0.100},
+    {sl:6,name:'Chandoi Pather LPS',mdm:0.999,bal:0.990},
+    {sl:7,name:'Chaulkhowa LPS',mdm:3.999,bal:0.510},
+    {sl:8,name:'Hiloidhari LPS',mdm:1.119,bal:0.100},
+    {sl:9,name:'Jalan Nagar TE LPS',mdm:0.924,bal:0.000},
+    {sl:10,name:'Japihajia(UPG EGS)',mdm:2.136,bal:0.100},
+    {sl:11,name:'Athabari LPS',mdm:1.977,bal:0.100},
+    {sl:12,name:'Dr. Ambedkar LPS',mdm:1.977,bal:0.100},
+    {sl:13,name:'Pub Chowkidingee LPS',mdm:0.000,bal:0.000}
+  ]}},
+  'Rohmaria-UPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:false,totalMdm:50.835,totalBal:0,schools:[
+    {sl:1,name:'Rohmaria HS',mdm:0.999,bal:0},
+    {sl:2,name:'Dhupabar MES',mdm:3.357,bal:0},
+    {sl:3,name:'Jnanudoy MES (I)',mdm:12.321,bal:0},
+    {sl:4,name:'Jnanudoy MES (II)',mdm:4.470,bal:0},
+    {sl:5,name:'Naboday MES(V)',mdm:15.165,bal:0},
+    {sl:6,name:'Makulbari Tea Estate Model School',mdm:3.168,bal:0},
+    {sl:7,name:'Mahmora MES',mdm:1.506,bal:0},
+    {sl:8,name:'Thanai MES',mdm:3.228,bal:0},
+    {sl:9,name:'Udayan MES',mdm:6.621,bal:0}
+  ]}},
+  'Rohmaria-LPS': {'Jan-Feb-Mar 2026':{label:'Jan/Feb/Mar 2026',isLPS:true,totalMdm:58.429,totalBal:7.280,schools:[
+    {sl:1,name:'Chamoni Maijan LPS',mdm:3.501,bal:0.990},
+    {sl:2,name:'Gualchuk LPS',mdm:2.001,bal:0.510},
+    {sl:3,name:'Rahmaria Girls HS',mdm:0.000,bal:0.000},
+    {sl:4,name:'Bihlongoni TE LPS',mdm:1.500,bal:0.100},
+    {sl:5,name:'Jyandip Dilkhushi LPS',mdm:0.552,bal:0.100},
+    {sl:6,name:'Bogoritali LPS',mdm:0.000,bal:0.000},
+    {sl:7,name:'Chengdharabari TG LPS',mdm:2.553,bal:0.100},
+    {sl:8,name:'Phukanarkhat Chengdhara MVS',mdm:6.000,bal:0.000},
+    {sl:9,name:'Mokalbar LPS(UPG EGS)',mdm:3.501,bal:0.000},
+    {sl:10,name:'Dhalajan TG LPS',mdm:0.000,bal:0.100},
+    {sl:11,name:'Garpara Konwar Gaon LPS',mdm:0.999,bal:0.990},
+    {sl:12,name:'Geni Chuk LPS',mdm:0.999,bal:0.990},
+    {sl:13,name:'Harorial LPS',mdm:1.500,bal:0.100},
+    {sl:14,name:'Jnanudoy MES',mdm:1.511,bal:0.000},
+    {sl:15,name:'Nimbari Barahi Da-Pather LPS',mdm:1.182,bal:0.100},
+    {sl:16,name:'Kachuwani Pather LPS',mdm:3.306,bal:0.100},
+    {sl:17,name:'Laruparia LPS',mdm:3.000,bal:0.510},
+    {sl:18,name:'Khagorijan LPS',mdm:3.501,bal:0.510},
+    {sl:19,name:'Mokalbar Kamakhyabari TG LPS',mdm:1.566,bal:0.100},
+    {sl:20,name:'Chapori Gaon LPS',mdm:1.713,bal:0.100},
+    {sl:21,name:'Rohmaria LPS',mdm:0.999,bal:0.000},
+    {sl:22,name:'Kalapara Mukalbari Jagaran LP',mdm:1.961,bal:0.100},
+    {sl:23,name:'Phukonorkhat LPS',mdm:0.663,bal:0.100},
+    {sl:24,name:'Mahmora MES',mdm:2.277,bal:0.100},
+    {sl:25,name:'Rohmoria Nabajyoti LPS',mdm:0.489,bal:0.100},
+    {sl:26,name:'Mohmara Hindi LPS(V)',mdm:2.433,bal:0.100},
+    {sl:27,name:'Thanai TE LPS',mdm:0.516,bal:0.100},
+    {sl:28,name:'Thanai Chuk LPS(UPG EGS)',mdm:2.211,bal:0.100},
+    {sl:29,name:'Thanai Bora Line LPS',mdm:6.501,bal:0.100},
+    {sl:30,name:'Thanai Palengtal Navajyoti LPS',mdm:2.167,bal:0.100}
+  ]}}
+};
+
+var SECTIONS = ['DWCCS-UPS','DWCCS-LPS','Bokul-UPS','Bokul-LPS','Rohmaria-UPS','Rohmaria-LPS'];
+var selSec = 'DWCCS-UPS';
+var selQtr = 'Jan-Feb-Mar 2026';
+var allEntries = {};
+var extraData = {};
+var editId = null;
+
+function eKey(s,q){return s+'__'+q;}
+function getEntries(s,q){return allEntries[eKey(s,q)]||[];}
+function setEntries(s,q,a){allEntries[eKey(s,q)]=a;}
+function getQ(s,q){if(DB[s]&&DB[s][q])return DB[s][q];if(extraData[s]&&extraData[s][q])return extraData[s][q];return null;}
+
+function loadSt(){try{var d=localStorage.getItem('mdm_v6');if(d){var p=JSON.parse(d);allEntries=p.e||{};extraData=p.x||{};}}catch(e){}}
+function saveSt(){try{localStorage.setItem('mdm_v6',JSON.stringify({e:allEntries,x:extraData}));}catch(e){}}
+
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmDate(s){if(!s)return'';var p=s.split('-');var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return p[2]+'-'+mo[parseInt(p[1])-1];}
+
+// ── SECTION BAR ──
+function buildSecBar(){
+  var bar=document.getElementById('sec-bar');
+  var labels={'DWCCS-UPS':'DWCCS\nUPS','DWCCS-LPS':'DWCCS\nLPS','Bokul-UPS':'Bokul\nUPS','Bokul-LPS':'Bokul\nLPS','Rohmaria-UPS':'Rohm\nUPS','Rohmaria-LPS':'Rohm\nLPS'};
+  bar.innerHTML='';
+  SECTIONS.forEach(function(s){
+    var b=document.createElement('div');
+    b.className='secbtn'+(s===selSec?' sel':'');
+    b.innerHTML=labels[s].replace('\n','<br>');
+    b.ontouchstart=(function(sec){return function(e){e.preventDefault();selSec=sec;buildSecBar();buildQtrBtns();updateStockBar();updateFormTitle();swTab('entry');};})(s);
+    bar.appendChild(b);
+  });
+}
+
+function buildQtrBtns(){
+  var cont=document.getElementById('qtr-btns');cont.innerHTML='';
+  var qtrs={};
+  if(DB[selSec])Object.keys(DB[selSec]).forEach(function(k){qtrs[k]=1;});
+  if(extraData[selSec])Object.keys(extraData[selSec]).forEach(function(k){qtrs[k]=1;});
+  Object.keys(qtrs).forEach(function(k){
+    var b=document.createElement('button');
+    b.className='qbtn'+(k===selQtr?' sel':'');
+    b.textContent=k;
+    b.ontouchstart=(function(key){return function(e){e.preventDefault();selQtr=key;buildQtrBtns();updateStockBar();updateFormTitle();swTab('entry');};})(k);
+    cont.appendChild(b);
+  });
+}
+
+function updateStockBar(){
+  var q=getQ(selSec,selQtr);
+  var entries=getEntries(selSec,selQtr);
+  var isLPS=q&&q.isLPS;
+  var isMdm=0,isBal=0;
+  entries.forEach(function(e){isMdm+=e.mdm;isBal+=(e.bal||0);});
+  var bar=document.getElementById('stock-bar');
+  if(!q){bar.style.gridTemplateColumns='1fr';bar.innerHTML='<div class="sb-item"><div class="sb-lbl">No Data</div><div class="sb-val" style="color:#f06060;">—</div></div>';return;}
+  bar.style.gridTemplateColumns='repeat(3,1fr)';
+  var remMdm=q.totalMdm-isMdm;
+  var html='<div class="sb-item"><div class="sb-lbl">MDM Total</div><div class="sb-val" style="color:#888;">'+q.totalMdm.toFixed(3)+'</div></div>'+
+    '<div class="sb-item"><div class="sb-lbl">MDM Issued</div><div class="sb-val" style="color:#7ddd44;">'+isMdm.toFixed(3)+'</div></div>'+
+    '<div class="sb-item"><div class="sb-lbl">MDM Left</div><div class="sb-val" style="color:#f06060;">'+remMdm.toFixed(3)+'</div></div>';
+  if(isLPS){
+    var remBal=q.totalBal-isBal;
+    html+='<div class="sb-item" style="border-top:1px solid #1a3a10;background:#0a1a0a;"><div class="sb-lbl">Bal Total</div><div class="sb-val" style="color:#888;font-size:10px;">'+q.totalBal.toFixed(3)+'</div></div>'+
+      '<div class="sb-item" style="border-top:1px solid #1a3a10;background:#0a1a0a;"><div class="sb-lbl">Bal Issued</div><div class="sb-val" style="color:#ffaa44;font-size:10px;">'+isBal.toFixed(3)+'</div></div>'+
+      '<div class="sb-item" style="border-top:1px solid #1a3a10;background:#0a1a0a;"><div class="sb-lbl">Bal Left</div><div class="sb-val" style="color:#f06060;font-size:10px;">'+remBal.toFixed(3)+'</div></div>';
+    bar.style.gridTemplateColumns='repeat(3,1fr)';
+  }
+  bar.innerHTML=html;
+}
+
+function updateFormTitle(){
+  var q=getQ(selSec,selQtr);
+  document.getElementById('no-data-msg').style.display=q?'none':'block';
+  document.getElementById('entry-form').style.display=q?'block':'none';
+  if(q){document.getElementById('form-title').textContent=selSec+' · '+q.label;document.getElementById('e-sl').placeholder='SL No (1-'+q.schools.length+')';}
+}
+
+function setMode(m){
+  document.getElementById('single-form').style.display=m==='single'?'block':'none';
+  document.getElementById('bulk-form').style.display=m==='bulk'?'block':'none';
+  document.getElementById('m-single').className='mbtn'+(m==='single'?' sel':'');
+  document.getElementById('m-bulk').className='mbtn'+(m==='bulk'?' sel':'');
+  if(m==='bulk')document.getElementById('b-date').value=document.getElementById('e-date').value||today();
+}
+
+function findSchool(){
+  var sl=parseInt(document.getElementById('e-sl').value);
+  var prev=document.getElementById('school-preview');
+  var qbox=document.getElementById('qty-box');
+  var q=getQ(selSec,selQtr);
+  if(!q||!sl||sl<1||sl>q.schools.length){prev.innerHTML='<span style="color:#333;">School name will appear here...</span>';qbox.style.display='none';return;}
+  var s=q.schools[sl-1];
+  prev.innerHTML='<span style="color:#7ddd44;">SL '+s.sl+' — '+s.name+'</span>';
+  var html='<div class="qty-row"><span class="qty-lbl">MDM Rice</span><span class="qty-val">'+s.mdm.toFixed(3)+' Qtl</span></div>';
+  if(q.isLPS)html+='<div class="qty-row"><span class="qty-lbl">Balvatika</span><span class="qty-val" style="color:#ffaa44;">'+s.bal.toFixed(3)+' Qtl</span></div>'+
+    '<div class="qty-row"><span class="qty-lbl">Total</span><span class="qty-val" style="color:#fff;">'+(s.mdm+s.bal).toFixed(3)+' Qtl</span></div>';
+  qbox.innerHTML=html;qbox.style.display='block';
+}
+
+function addEntry(){
+  var date=document.getElementById('e-date').value||today();
+  var memo=document.getElementById('e-memo').value.trim();
+  var sl=parseInt(document.getElementById('e-sl').value);
+  var q=getQ(selSec,selQtr);
+  if(!memo){alert('Enter Memo No!');return;}
+  if(!q||!sl||sl<1||sl>q.schools.length){alert('Invalid SL No!');return;}
+  var entries=getEntries(selSec,selQtr);
+  if(entries.find(function(e){return e.sl===sl;})){alert('SL '+sl+' already added!');return;}
+  var s=q.schools[sl-1];
+  entries.push({id:Date.now(),date:date,memo:memo,sl:sl,name:s.name,mdm:s.mdm,bal:s.bal||0});
+  entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+  setEntries(selSec,selQtr,entries);saveSt();
+  document.getElementById('e-memo').value='';document.getElementById('e-sl').value='';
+  document.getElementById('school-preview').innerHTML='<span style="color:#333;">School name will appear here...</span>';
+  document.getElementById('qty-box').style.display='none';
+  updateStockBar();showToast('✅ '+s.name);
+}
+
+function addBulk(){
+  var date=document.getElementById('b-date').value||today();
+  var txt=document.getElementById('bulk-txt').value.trim();
+  if(!txt){alert('Enter data!');return;}
+  var q=getQ(selSec,selQtr);if(!q){alert('No data!');return;}
+  var lines=txt.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  var entries=getEntries(selSec,selQtr);
+  var added=0,skipped=[];
+  lines.forEach(function(line){
+    var parts=line.split(',');if(parts.length<2){skipped.push(line);return;}
+    var sl=parseInt(parts[0]);var memo=parts.slice(1).join(',').trim();
+    if(!sl||sl<1||sl>q.schools.length){skipped.push('SL '+sl+' invalid');return;}
+    if(entries.find(function(e){return e.sl===sl;})){skipped.push('SL '+sl+' exists');return;}
+    var s=q.schools[sl-1];
+    entries.push({id:Date.now()+added,date:date,memo:memo,sl:sl,name:s.name,mdm:s.mdm,bal:s.bal||0});added++;
+  });
+  entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+  setEntries(selSec,selQtr,entries);saveSt();updateStockBar();
+  document.getElementById('bulk-txt').value='';
+  if(skipped.length>0)alert(added+' added!\nSkipped:\n'+skipped.join('\n'));
+  else showToast('✅ '+added+' schools added!');
+}
+
+function renderRegister(){
+  var entries=getEntries(selSec,selQtr);
+  var q=getQ(selSec,selQtr);var isLPS=q&&q.isLPS;
+  var qLabel=q?q.label:selQtr;
+  document.getElementById('r-count').textContent=entries.length+' Collected — '+selSec+' '+qLabel;
+  var cols=isLPS?8:6;
+  document.getElementById('reg-thead').innerHTML='<th>SL</th><th>Memo</th><th class="left">School Name</th><th style="color:#aaddff;font-size:9px;">Quarter</th><th>MDM</th>'+(isLPS?'<th style="color:#ffaa44;">Bal</th><th>Total</th>':'')+'<th></th>';
+  var tbody=document.getElementById('reg-tbody');var tfoot=document.getElementById('reg-tfoot');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="'+cols+'" style="text-align:center;padding:20px;color:#333;">No entries yet!</td></tr>';tfoot.innerHTML='';return;}
+  var html='';var tM=0,tB=0;
+  entries.forEach(function(e,i){
+    tM+=e.mdm;tB+=(e.bal||0);
+    var bg=i%2===0?'#0d150a':'#111a0e';
+    html+='<tr style="background:'+bg+';">'+
+      '<td style="color:#445533;font-size:10px;">'+e.sl+'</td>'+
+      '<td style="color:#7ddd44;font-weight:700;">'+e.memo+'</td>'+
+      '<td class="left">'+e.name+'<br><span style="font-size:9px;color:#445533;">'+fmDate(e.date)+'</span></td>'+
+      '<td style="color:#aaddff;font-size:9px;">'+qLabel+'</td>'+
+      '<td style="color:#00e5ff;font-weight:700;">'+e.mdm.toFixed(3)+'</td>'+
+      (isLPS?'<td style="color:#ffaa44;font-weight:700;">'+(e.bal||0).toFixed(3)+'</td><td style="color:#fff;font-weight:800;">'+(e.mdm+(e.bal||0)).toFixed(3)+'</td>':'')+
+      '<td style="white-space:nowrap;">'+
+        '<button style="background:none;border:none;color:#7ddd44;cursor:pointer;font-size:11px;padding:2px 3px;" ontouchstart="openEdit('+e.id+')">✏️</button>'+
+        '<button style="background:none;border:none;color:#333;cursor:pointer;font-size:12px;padding:2px 3px;" ontouchstart="delEntry('+e.id+')">✕</button>'+
+      '</td></tr>';
+  });
+  tbody.innerHTML=html;
+  tfoot.innerHTML='<tr><td colspan="4" style="text-align:left;padding-left:8px;">TOTAL ('+entries.length+')</td>'+
+    '<td style="color:#00e5ff;">'+tM.toFixed(3)+'</td>'+
+    (isLPS?'<td style="color:#ffaa44;">'+tB.toFixed(3)+'</td><td style="color:#fff;">'+(tM+tB).toFixed(3)+'</td>':'')+
+    '<td></td></tr>';
+}
+
+function renderPending(){
+  var q=getQ(selSec,selQtr);
+  if(!q){document.getElementById('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:#333;">No data!</div>';return;}
+  var collected=getEntries(selSec,selQtr).map(function(e){return e.sl;});
+  var pending=q.schools.filter(function(s){return collected.indexOf(s.sl)===-1;});
+  document.getElementById('pend-title').textContent=pending.length+' Pending — '+selSec+' '+q.label;
+  if(!pending.length){document.getElementById('pending-list').innerHTML='<div style="text-align:center;padding:20px;color:#7ddd44;">🎉 All collected!</div>';return;}
+  var html='';
+  pending.forEach(function(s){
+    html+='<div class="pend-card"><div><div class="pend-name">'+s.name+'</div><div class="pend-sl">SL '+s.sl+'</div></div>'+
+      '<div class="pend-qty">MDM: '+s.mdm.toFixed(3)+(q.isLPS?'<br>Bal: '+s.bal.toFixed(3):'')+'</div></div>';
+  });
+  document.getElementById('pending-list').innerHTML=html;
+}
+
+function renderSummary(){
+  var entries=getEntries(selSec,selQtr);var q=getQ(selSec,selQtr);var isLPS=q&&q.isLPS;
+  var tM=0,tB=0;entries.forEach(function(e){tM+=e.mdm;tB+=(e.bal||0);});
+  document.getElementById('sum-totals').innerHTML='<div style="display:grid;grid-template-columns:'+(isLPS?'1fr 1fr 1fr':'1fr 1fr')+';gap:8px;text-align:center;">'+
+    '<div><div style="font-size:9px;color:#445533;text-transform:uppercase;">MDM Issued</div><div style="font-size:20px;font-weight:800;color:#7ddd44;">'+tM.toFixed(3)+'</div></div>'+
+    (isLPS?'<div><div style="font-size:9px;color:#445533;text-transform:uppercase;">Bal Issued</div><div style="font-size:20px;font-weight:800;color:#ffaa44;">'+tB.toFixed(3)+'</div></div>'+
+    '<div><div style="font-size:9px;color:#445533;text-transform:uppercase;">Grand Total</div><div style="font-size:20px;font-weight:800;color:#fff;">'+(tM+tB).toFixed(3)+'</div></div>':
+    '<div><div style="font-size:9px;color:#445533;text-transform:uppercase;">Schools</div><div style="font-size:20px;font-weight:800;color:#00e5ff;">'+entries.length+'</div></div>')+
+  '</div>';
+  if(!entries.length){document.getElementById('sum-list').innerHTML='<div style="text-align:center;padding:20px;color:#333;">No entries!</div>';return;}
+  var html='';
+  entries.forEach(function(e){
+    html+='<div style="display:flex;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #1a2e10;align-items:center;">'+
+      '<span style="color:#c8d8c0;font-size:11px;flex:1;">'+e.name+'</span>'+
+      '<div style="text-align:right;"><div style="font-size:12px;font-weight:700;color:#00e5ff;">'+e.mdm.toFixed(3)+'</div>'+
+      (isLPS?'<div style="font-size:10px;color:#ffaa44;">'+(e.bal||0).toFixed(3)+'</div>':'')+
+      '</div></div>';
+  });
+  document.getElementById('sum-list').innerHTML=html;
+}
+
+function loadAdmin(){
+  var txt=document.getElementById('admin-paste').value.trim();
+  if(!txt){alert('Paste data first!');return;}
+  var lines=txt.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  if(!lines[0].startsWith('QTR:')){alert('Invalid! First line must start with QTR:');return;}
+  try{
+    var parts=lines[0].replace('QTR:','').split('|');
+    var qKey=parts[0].trim();var secKey=parts[1].trim();var tot=parseFloat(parts[2])||0;
+    var isLPS=secKey.indexOf('LPS')>-1;var schools=[];
+    for(var i=1;i<lines.length;i++){
+      var p=lines[i].split('|');if(p.length<3)continue;
+      schools.push({sl:parseInt(p[0]),name:p[1].trim(),mdm:parseFloat(p[2])||0,bal:parseFloat(p[3])||0});
+    }
+    if(!extraData[secKey])extraData[secKey]={};
+    extraData[secKey][qKey]={label:qKey,isLPS:isLPS,totalMdm:tot,totalBal:0,schools:schools};
+    saveSt();selSec=secKey;selQtr=qKey;
+    buildSecBar();buildQtrBtns();updateStockBar();updateFormTitle();
+    document.getElementById('admin-paste').value='';renderAdminList();
+    showToast('✅ '+secKey+' '+qKey+' loaded!');
+  }catch(err){alert('Error! Check format.');}
+}
+
+function renderAdminList(){
+  var html='';
+  var allSecs=SECTIONS.slice();
+  if(extraData)Object.keys(extraData).forEach(function(s){if(allSecs.indexOf(s)===-1)allSecs.push(s);});
+  allSecs.forEach(function(sec){
+    var qtrs={};
+    if(DB[sec])Object.keys(DB[sec]).forEach(function(k){qtrs[k]={bi:true};});
+    if(extraData[sec])Object.keys(extraData[sec]).forEach(function(k){qtrs[k]=qtrs[k]||{bi:false};});
+    Object.keys(qtrs).forEach(function(k){
+      var q=(DB[sec]&&DB[sec][k])||(extraData[sec]&&extraData[sec][k]);
+      var cnt=getEntries(sec,k).length;
+      html+='<div style="background:#0d150a;border-radius:8px;padding:9px 12px;margin-bottom:6px;border:1px solid #1a2e10;display:flex;justify-content:space-between;align-items:center;">'+
+        '<div><div style="font-size:12px;font-weight:700;color:#7ddd44;">'+sec+' · '+k+'</div>'+
+        '<div style="font-size:10px;color:#445533;">'+(q?q.schools.length:0)+' schools · '+cnt+' entries'+(qtrs[k].bi?' · Built-in':'')+'</div></div>'+
+        (!qtrs[k].bi?'<button ontouchstart="delExtra(\''+sec+'\',\''+k+'\')" style="background:none;border:1px solid #333;border-radius:5px;color:#555;font-size:10px;padding:3px 8px;cursor:pointer;">🗑</button>':'<span style="color:#2a5a15;">✅</span>')+
+      '</div>';
+    });
+  });
+  document.getElementById('qtr-list').innerHTML=html||'<div style="color:#333;font-size:12px;">No extra quarters.</div>';
+}
+
+function delExtra(sec,k){
+  if(!confirm('Remove '+sec+' '+k+'?'))return;
+  if(extraData[sec])delete extraData[sec][k];
+  delete allEntries[eKey(sec,k)];
+  saveSt();buildQtrBtns();renderAdminList();showToast('🗑 Removed!');
+}
+
+function openEdit(id){
+  var e=getEntries(selSec,selQtr).find(function(x){return x.id===id;});if(!e)return;
+  editId=id;
+  document.getElementById('edit-name').textContent='SL '+e.sl+' — '+e.name;
+  document.getElementById('edit-date').value=e.date;
+  document.getElementById('edit-memo').value=e.memo;
+  document.getElementById('edit-modal').style.display='flex';
+}
+function closeEdit(){document.getElementById('edit-modal').style.display='none';editId=null;}
+function saveEdit(){
+  if(!editId)return;
+  var entries=getEntries(selSec,selQtr);
+  var e=entries.find(function(x){return x.id===editId;});if(!e){closeEdit();return;}
+  e.date=document.getElementById('edit-date').value;
+  e.memo=document.getElementById('edit-memo').value.trim();
+  entries.sort(function(a,b){return a.date.localeCompare(b.date);});
+  setEntries(selSec,selQtr,entries);saveSt();closeEdit();renderRegister();showToast('✅ Updated!');
+}
+
+function delEntry(id){
+  if(!confirm('Delete?'))return;
+  var entries=getEntries(selSec,selQtr).filter(function(e){return e.id!==id;});
+  setEntries(selSec,selQtr,entries);saveSt();updateStockBar();renderRegister();showToast('🗑 Deleted!');
+}
+function clearAll(){
+  if(!confirm('Clear ALL for '+selSec+' '+selQtr+'?'))return;
+  setEntries(selSec,selQtr,[]);saveSt();updateStockBar();renderRegister();showToast('🗑 Cleared!');
+}
+
+function swTab(t){
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('page-'+t).classList.add('active');
+  if(t==='register')renderRegister();
+  if(t==='pending')renderPending();
+  if(t==='summary')renderSummary();
+  if(t==='admin')renderAdminList();
+  if(t==='entry')updateFormTitle();
+}
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(function(){t.style.display='none';},2500);}
+
+// INIT
+document.getElementById('e-date').value=today();
+document.getElementById('b-date').value=today();
+loadSt();buildSecBar();buildQtrBtns();updateStockBar();updateFormTitle();
+</script>
+</body>
+</html>
